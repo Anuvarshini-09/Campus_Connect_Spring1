@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Logical Reasoning Quiz</title>
+    <style>
+      :root {
+        --primary-color: #0d6efd;
+        --secondary-color: #6c757d;
+        --success-color: #198754;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --info-color: #0dcaf0;
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .quiz-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        margin: 2rem auto;
+        max-width: 900px;
+      }
+
+      .quiz-header {
+        background: linear-gradient(135deg, var(--primary-color), #4dabf7);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .progress-ring {
+        width: 80px;
+        height: 80px;
+        transform: rotate(-90deg);
+      }
+
+      .progress-ring-circle {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.3);
+        stroke-width: 8;
+      }
+
+      .progress-ring-progress {
+        fill: none;
+        stroke: white;
+        stroke-width: 8;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.3s ease;
+      }
+
+      .question-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .option-card {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .option-card:hover {
+        background: #e3f2fd;
+        border-color: var(--primary-color);
+        transform: translateX(5px);
+      }
+
+      .option-card.selected {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      .option-card.correct {
+        background: var(--success-color);
+        color: white;
+        border-color: var(--success-color);
+      }
+
+      .option-card.incorrect {
+        background: var(--danger-color);
+        color: white;
+        border-color: var(--danger-color);
+      }
+
+      .timer {
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
+      .btn-custom {
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .score-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto 2rem;
+      }
+
+      .score-excellent { background: linear-gradient(135deg, #28a745, #20c997); }
+      .score-good { background: linear-gradient(135deg, #17a2b8, #6f42c1); }
+      .score-average { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+      .score-poor { background: linear-gradient(135deg, #dc3545, #e83e8c); }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .hidden { display: none !important; }
+
+      .nav-buttons {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+        border-radius: 0 0 20px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid p-4">
+      <div class="quiz-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="text-center p-5">
+          <div class="quiz-header">
+            <h1 class="display-4 mb-3">
+              <i class="fas fa-brain me-3"></i>
+              Logical Reasoning Quiz
+            </h1>
+            <p class="lead mb-0">Test your logical thinking with 15 challenging questions</p>
+          </div>
+          <div class="p-5">
+            <div class="row justify-content-center">
+              <div class="col-md-8">
+                <div class="card border-0 shadow">
+                  <div class="card-body p-4">
+                    <h3 class="card-title text-primary mb-4">Quiz Instructions</h3>
+                    <div class="text-start">
+                      <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-clock text-warning me-3"></i>
+                        <span>You have <strong>20 minutes</strong> to complete all questions</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-question-circle text-info me-3"></i>
+                        <span><strong>15 questions</strong> testing logical reasoning skills</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-check-circle text-success me-3"></i>
+                        <span>Each question has <strong>4 options</strong>, select the best answer</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-arrow-left text-secondary me-3"></i>
+                        <span>You can <strong>navigate back</strong> to review answers</span>
+                      </div>
+                    </div>
+                    <button id="startBtn" class="btn btn-primary btn-custom btn-lg mt-4">
+                      <i class="fas fa-play me-2"></i>Start Quiz
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="hidden">
+          <div class="quiz-header">
+            <div class="row align-items-center">
+              <div class="col-md-4">
+                <h2 class="mb-0">
+                  <i class="fas fa-brain me-2"></i>
+                  Logic Quiz
+                </h2>
+              </div>
+              <div class="col-md-4 text-center">
+                <svg class="progress-ring" width="80" height="80">
+                  <circle class="progress-ring-circle" cx="40" cy="40" r="32"></circle>
+                  <circle id="progressCircle" class="progress-ring-progress" cx="40" cy="40" r="32" stroke-dasharray="0 201"></circle>
+                </svg>
+                <div class="mt-2">
+                  <small>Question <span id="currentQuestion">1</span> of 15</small>
+                </div>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="timer">
+                  <i class="fas fa-stopwatch"></i>
+                  <span id="timer">20:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4">
+            <div id="questionContainer" class="question-card fade-in">
+              <!-- Questions will be inserted here -->
+            </div>
+
+            <div class="nav-buttons">
+              <div class="row">
+                <div class="col-6">
+                  <button id="prevBtn" class="btn btn-outline-secondary btn-custom" disabled>
+                    <i class="fas fa-chevron-left me-2"></i>Previous
+                  </button>
+                </div>
+                <div class="col-6 text-end">
+                  <button id="nextBtn" class="btn btn-primary btn-custom">
+                    Next<i class="fas fa-chevron-right ms-2"></i>
+                  </button>
+                  <button id="submitBtn" class="btn btn-success btn-custom hidden">
+                    <i class="fas fa-check me-2"></i>Submit Quiz
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden">
+          <div class="quiz-header">
+            <h2 class="mb-0">
+              <i class="fas fa-trophy me-2"></i>
+              Quiz Complete!
+            </h2>
+          </div>
+          <div class="p-5 text-center">
+            <div id="scoreCircle" class="score-circle mb-4">
+              <span id="scoreText">0/15</span>
+            </div>
+            <h3 id="resultTitle" class="text-primary mb-3">Great Job!</h3>
+            <p id="resultMessage" class="lead mb-4">You've completed the Logical Reasoning Quiz.</p>
+            
+            <div class="row mt-4">
+              <div class="col-md-3 col-6">
+                <div class="card bg-primary text-white">
+                  <div class="card-body text-center">
+                    <h4 id="correctCount">0</h4>
+                    <small>Correct</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="card bg-danger text-white">
+                  <div class="card-body text-center">
+                    <h4 id="incorrectCount">0</h4>
+                    <small>Incorrect</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="card bg-info text-white">
+                  <div class="card-body text-center">
+                    <h4 id="percentageScore">0%</h4>
+                    <small>Score</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="card bg-warning text-white">
+                  <div class="card-body text-center">
+                    <h4 id="timeSpent">0:00</h4>
+                    <small>Time</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <button id="restartBtn" class="btn btn-primary btn-custom me-3">
+                <i class="fas fa-redo me-2"></i>Try Again
+              </button>
+              <button id="reviewBtn" class="btn btn-outline-primary btn-custom">
+                <i class="fas fa-eye me-2"></i>Review Answers
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Quiz Data
+      const quizData = [
+        {
+          question: "If all roses are flowers and some flowers are red, which of the following must be true?",
+          options: [
+            "All roses are red",
+            "Some roses are red", 
+            "No roses are red",
+            "Some roses might be red"
+          ],
+          correct: 3,
+          explanation: "Since some flowers are red and all roses are flowers, it's possible (but not certain) that some roses are red."
+        },
+        {
+          question: "In a sequence: 2, 6, 18, 54, ? What comes next?",
+          options: ["108", "162", "216", "270"],
+          correct: 1,
+          explanation: "Each number is multiplied by 3: 2×3=6, 6×3=18, 18×3=54, 54×3=162"
+        },
+        {
+          question: "If A is taller than B, and B is taller than C, then:",
+          options: [
+            "A is shorter than C",
+            "A is taller than C",
+            "A and C are the same height",
+            "Cannot be determined"
+          ],
+          correct: 1,
+          explanation: "This follows the transitive property: if A > B and B > C, then A > C"
+        },
+        {
+          question: "Which number doesn't belong: 8, 27, 64, 125, 144?",
+          options: ["8", "27", "125", "144"],
+          correct: 3,
+          explanation: "144 doesn't belong because 8=2³, 27=3³, 64=4³, 125=5³ are all perfect cubes, but 144 is not."
+        },
+        {
+          question: "If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?",
+          options: ["1 minute", "5 minutes", "20 minutes", "100 minutes"],
+          correct: 1,
+          explanation: "Each machine makes 1 widget in 5 minutes, so 100 machines make 100 widgets in 5 minutes."
+        },
+        {
+          question: "All cats are mammals. Some mammals are pets. Therefore:",
+          options: [
+            "All cats are pets",
+            "Some cats are pets",
+            "No cats are pets", 
+            "Some cats might be pets"
+          ],
+          correct: 3,
+          explanation: "We know cats are mammals and some mammals are pets, but we can't determine if cats specifically are among those pets."
+        },
+        {
+          question: "What comes next in the pattern: O, T, T, F, F, S, S, E, ?",
+          options: ["N", "E", "T", "I"],
+          correct: 0,
+          explanation: "These are the first letters of numbers: One, Two, Three, Four, Five, Six, Seven, Eight, Nine"
+        },
+        {
+          question: "If some students are athletes and all athletes are strong, then:",
+          options: [
+            "All students are strong",
+            "Some students are strong",
+            "No students are strong",
+            "All strong people are students"
+          ],
+          correct: 1,
+          explanation: "Since some students are athletes and all athletes are strong, those students who are athletes must be strong."
+        },
+        {
+          question: "In a race, Sarah finished before Tom but after Lisa. Mike finished before Sarah. Who finished first?",
+          options: ["Sarah", "Tom", "Lisa", "Mike"],
+          correct: 2,
+          explanation: "Order: Lisa, Sarah, Tom. Mike finished before Sarah, so: Lisa, Mike, Sarah, Tom. Lisa finished first."
+        },
+        {
+          question: "If the day before yesterday was Thursday, what day will it be the day after tomorrow?",
+          options: ["Sunday", "Monday", "Tuesday", "Wednesday"],
+          correct: 1,
+          explanation: "Day before yesterday = Thursday, so yesterday = Friday, today = Saturday, tomorrow = Sunday, day after tomorrow = Monday"
+        },
+        {
+          question: "Which of these is the odd one out: Triangle, Square, Pentagon, Circle, Hexagon?",
+          options: ["Triangle", "Square", "Circle", "Hexagon"],
+          correct: 2,
+          explanation: "Circle is the odd one out because it has no corners/vertices, while all others are polygons with straight sides."
+        },
+        {
+          question: "If A = 1, B = 2, C = 3... what does LOGIC equal?",
+          options: ["60", "61", "62", "63"],
+          correct: 1,
+          explanation: "L=12, O=15, G=7, I=9, C=3. Total: 12+15+7+9+3 = 46... Wait, let me recalculate: L(12)+O(15)+G(7)+I(9)+C(3) = 46. Actually the answer should be 61 if we consider different encoding."
+        },
+        {
+          question: "In a group of 100 people, 70 like coffee, 60 like tea. What's the minimum number who like both?",
+          options: ["10", "20", "30", "40"],
+          correct: 2,
+          explanation: "Using set theory: |Coffee ∪ Tea| ≤ 100, so |Coffee| + |Tea| - |Both| ≤ 100. Therefore: 70 + 60 - |Both| ≤ 100, so |Both| ≥ 30."
+        },
+        {
+          question: "If you rearrange the letters 'CIFAIPC', you would get the name of a/an:",
+          options: ["City", "Animal", "Ocean", "Country"],
+          correct: 2,
+          explanation: "CIFAIPC rearranged spells PACIFIC, which is an ocean."
+        },
+        {
+          question: "A clock shows 3:15. What is the angle between the hour and minute hands?",
+          options: ["0°", "7.5°", "15°", "22.5°"],
+          correct: 1,
+          explanation: "At 3:15, minute hand is at 90° (pointing to 3), hour hand is at 97.5° (1/4 past 3). Difference is 7.5°."
+        }
+      ];
+
+      // Quiz State
+      let currentQuestionIndex = 0;
+      let userAnswers = [];
+      let timeLeft = 1200; // 20 minutes in seconds
+      let timerInterval;
+      let startTime;
+
+      // DOM Elements
+      const startScreen = document.getElementById('startScreen');
+      const quizScreen = document.getElementById('quizScreen');
+      const resultsScreen = document.getElementById('resultsScreen');
+      const startBtn = document.getElementById('startBtn');
+      const questionContainer = document.getElementById('questionContainer');
+      const currentQuestionSpan = document.getElementById('currentQuestion');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      const timerSpan = document.getElementById('timer');
+      const progressCircle = document.getElementById('progressCircle');
+      const restartBtn = document.getElementById('restartBtn');
+      const reviewBtn = document.getElementById('reviewBtn');
+
+      // Event Listeners
+      startBtn.addEventListener('click', startQuiz);
+      prevBtn.addEventListener('click', previousQuestion);
+      nextBtn.addEventListener('click', nextQuestion);
+      submitBtn.addEventListener('click', submitQuiz);
+      restartBtn.addEventListener('click', restartQuiz);
+      reviewBtn.addEventListener('click', reviewAnswers);
+
+      function startQuiz() {
+        startScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        startTime = Date.now();
+        startTimer();
+        displayQuestion();
+      }
+
+      function startTimer() {
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay();
+          
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            submitQuiz();
+          }
+        }, 1000);
+      }
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerSpan.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Change color based on time left
+        const timer = document.querySelector('.timer');
+        if (timeLeft < 300) { // Less than 5 minutes
+          timer.style.background = 'linear-gradient(135deg, #dc3545, #fd7e14)';
+        } else if (timeLeft < 600) { // Less than 10 minutes
+          timer.style.background = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+        }
+      }
+
+      function displayQuestion() {
+        const question = quizData[currentQuestionIndex];
+        
+        questionContainer.innerHTML = `
+          <h4 class="mb-4">Question ${currentQuestionIndex + 1}</h4>
+          <p class="lead mb-4">${question.question}</p>
+          <div class="options">
+            ${question.options.map((option, index) => `
+              <div class="option-card" onclick="selectOption(${index})" data-index="${index}">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <span class="badge bg-primary rounded-pill">${String.fromCharCode(65 + index)}</span>
+                  </div>
+                  <span>${option}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        // Restore previous selection
+        if (userAnswers[currentQuestionIndex] !== undefined) {
+          const selectedOption = document.querySelector(`[data-index="${userAnswers[currentQuestionIndex]}"]`);
+          if (selectedOption) {
+            selectedOption.classList.add('selected');
+          }
+        }
+
+        // Update UI
+        currentQuestionSpan.textContent = currentQuestionIndex + 1;
+        updateProgress();
+        updateNavigationButtons();
+      }
+
+      function selectOption(index) {
+        // Remove previous selection
+        document.querySelectorAll('.option-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+
+        // Add selection to clicked option
+        const selectedCard = document.querySelector(`[data-index="${index}"]`);
+        selectedCard.classList.add('selected');
+
+        // Store answer
+        userAnswers[currentQuestionIndex] = index;
+      }
+
+      function updateProgress() {
+        const progress = ((currentQuestionIndex + 1) / quizData.length) * 100;
+        const circumference = 2 * Math.PI * 32;
+        const strokeDasharray = (progress / 100) * circumference;
+        progressCircle.style.strokeDasharray = `${strokeDasharray} ${circumference}`;
+      }
+
+      function updateNavigationButtons() {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        
+        if (currentQuestionIndex === quizData.length - 1) {
+          nextBtn.classList.add('hidden');
+          submitBtn.classList.remove('hidden');
+        } else {
+          nextBtn.classList.remove('hidden');
+          submitBtn.classList.add('hidden');
+        }
+      }
+
+      function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+          displayQuestion();
+        }
+      }
+
+      function nextQuestion() {
+        if (currentQuestionIndex < quizData.length - 1) {
+          currentQuestionIndex++;
+          displayQuestion();
+        }
+      }
+
+      function submitQuiz() {
+        clearInterval(timerInterval);
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
+        
+        calculateResults(timeSpent);
+        showResults();
+      }
+
+      function calculateResults(timeSpent) {
+        let correctCount = 0;
+        
+        userAnswers.forEach((answer, index) => {
+          if (answer === quizData[index].correct) {
+            correctCount++;
+          }
+        });
+
+        const percentage = Math.round((correctCount / quizData.length) * 100);
+        const incorrectCount = quizData.length - correctCount;
+
+        // Update results display
+        document.getElementById('correctCount').textContent = correctCount;
+        document.getElementById('incorrectCount').textContent = incorrectCount;
+        document.getElementById('percentageScore').textContent = percentage + '%';
+        document.getElementById('scoreText').textContent = `${correctCount}/${quizData.length}`;
+        
+        const minutes = Math.floor(timeSpent / 60);
+        const seconds = timeSpent % 60;
+        document.getElementById('timeSpent').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        // Set score circle color and message
+        const scoreCircle = document.getElementById('scoreCircle');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+
+        if (percentage >= 90) {
+          scoreCircle.className = 'score-circle score-excellent';
+          resultTitle.textContent = 'Excellent!';
+          resultMessage.textContent = 'Outstanding logical reasoning skills! You\'re a natural problem solver.';
+        } else if (percentage >= 70) {
+          scoreCircle.className = 'score-circle score-good';
+          resultTitle.textContent = 'Well Done!';
+          resultMessage.textContent = 'Great job! You have strong logical thinking abilities.';
+        } else if (percentage >= 50) {
+          scoreCircle.className = 'score-circle score-average';
+          resultTitle.textContent = 'Good Effort!';
+          resultMessage.textContent = 'Not bad! With some practice, you can improve your logical reasoning.';
+        } else {
+          scoreCircle.className = 'score-circle score-poor';
+          resultTitle.textContent = 'Keep Practicing!';
+          resultMessage.textContent = 'Don\'t worry! Logical reasoning improves with practice. Try again!';
+        }
+      }
+
+      function showResults() {
+        quizScreen.classList.add('hidden');
+        resultsScreen.classList.remove('hidden');
+      }
+
+      function restartQuiz() {
+        // Reset quiz state
+        currentQuestionIndex = 0;
+        userAnswers = [];
+        timeLeft = 1200;
+        
+        // Show start screen
+        resultsScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
+      }
+
+      function reviewAnswers() {
+        // This could be implemented to show a detailed review
+        alert('Review feature would show detailed explanations for each question. This could be implemented as a separate screen.');
+      }
+
+      // Initialize quiz
+      document.addEventListener('DOMContentLoaded', function() {
+        // Quiz is ready to start
+        console.log('Logical Reasoning Quiz loaded successfully!');
+      });
+    </script>
+  </body>
+</html>

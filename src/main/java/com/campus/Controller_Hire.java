@@ -73,6 +73,11 @@ public class Controller_Hire {
     	return "micro_test";
     }
     
+    @GetMapping("/locial-mcq")
+    public String Logical() {
+    	return "/logical_rea";
+    }
+    
     
 	
 
