@@ -67,6 +67,13 @@ public class Controller_Hire {
         recruiterRepository.save(recruiter);
         return "redirect:/recruiter?success=true";
     }
+    
+    @GetMapping("/micro-test")
+    public String Micro_Test() {
+    	return "micro_test";
+    }
+    
+    
 	
 
 }

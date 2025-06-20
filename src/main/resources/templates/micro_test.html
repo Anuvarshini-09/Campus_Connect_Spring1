@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechQuiz Pro - Technical Assessment</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                TechQuiz Pro
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="timer">15:00</span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                
+                <!-- Welcome Screen -->
+                <div id="welcomeScreen" class="card shadow-lg border-0 mb-4">
+                    <div class="card-body text-center p-5">
+                        <div class="welcome-icon mb-4">
+                            <i class="bi bi-code-square display-1 text-primary"></i>
+                        </div>
+                        <h1 class="display-4 fw-bold text-dark mb-3">Technical Assessment</h1>
+                        <p class="lead text-muted mb-4">Test your knowledge with 15 challenging technical questions</p>
+                        
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <div class="feature-card">
+                                    <i class="bi bi-question-circle-fill text-primary fs-1 mb-3"></i>
+                                    <h5 class="fw-semibold">15 Questions</h5>
+                                    <p class="text-muted small mb-0">Comprehensive technical assessment</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-card">
+                                    <i class="bi bi-stopwatch-fill text-success fs-1 mb-3"></i>
+                                    <h5 class="fw-semibold">15 Minutes</h5>
+                                    <p class="text-muted small mb-0">Complete within time limit</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-card">
+                                    <i class="bi bi-trophy-fill text-warning fs-1 mb-3"></i>
+                                    <h5 class="fw-semibold">Instant Results</h5>
+                                    <p class="text-muted small mb-0">Get your score immediately</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-lg px-5 py-3 fw-semibold" onclick="startQuiz()">
+                            <i class="bi bi-play-fill me-2"></i>
+                            Start Quiz
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Screen -->
+                <div id="quizScreen" class="d-none">
+                    <div class="row">
+                        <!-- Question Panel -->
+                        <div class="col-lg-8">
+                            <div class="card shadow-lg border-0 h-100">
+                                <div class="card-header bg-white border-0 px-4 py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0 fw-semibold">
+                                            Question <span id="currentQuestionNumber">1</span> of 15
+                                        </h5>
+                                        <div class="progress-container">
+                                            <div class="progress" style="width: 200px; height: 8px;">
+                                                <div id="progressBar" class="progress-bar bg-primary" role="progressbar" style="width: 6.67%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body px-4 py-4">
+                                    <div class="question-container">
+                                        <h4 id="questionText" class="question-text mb-4"></h4>
+                                        <div id="optionsContainer" class="options-container">
+                                            <!-- Options will be dynamically generated -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer bg-white border-0 px-4 py-3">
+                                    <div class="d-flex justify-content-between">
+                                        <button id="prevBtn" class="btn btn-outline-secondary" onclick="previousQuestion()" disabled>
+                                            <i class="bi bi-arrow-left me-2"></i>Previous
+                                        </button>
+                                        <button id="nextBtn" class="btn btn-primary" onclick="nextQuestion()">
+                                            Next<i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                        <button id="submitBtn" class="btn btn-success d-none" onclick="submitQuiz()">
+                                            <i class="bi bi-check-circle me-2"></i>Submit Quiz
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sidebar -->
+                        <div class="col-lg-4">
+                            <div class="sticky-top" style="top: 1rem;">
+                                <!-- Question Navigator -->
+                                <div class="card shadow-lg border-0 mb-4">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="card-title mb-0 fw-semibold">
+                                            <i class="bi bi-list-ol me-2"></i>
+                                            Question Navigator
+                                        </h6>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <div id="questionNavigator" class="question-nav-grid">
+                                            <!-- Question navigation buttons will be generated -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quiz Stats -->
+                                <div class="card shadow-lg border-0">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0 fw-semibold">
+                                            <i class="bi bi-graph-up me-2"></i>
+                                            Quiz Statistics
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="stats-item mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Answered:</span>
+                                                <span id="answeredCount" class="fw-semibold text-success">0/15</span>
+                                            </div>
+                                        </div>
+                                        <div class="stats-item mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Remaining:</span>
+                                                <span id="remainingCount" class="fw-semibold text-warning">15</span>
+                                            </div>
+                                        </div>
+                                        <div class="stats-item">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Time Left:</span>
+                                                <span id="timeLeft" class="fw-semibold text-primary">15:00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Screen -->
+                <div id="resultsScreen" class="d-none">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body text-center p-5">
+                            <div id="resultIcon" class="mb-4">
+                                <!-- Icon will be set based on score -->
+                            </div>
+                            <h1 class="display-4 fw-bold mb-3" id="resultTitle"></h1>
+                            <p class="lead text-muted mb-4" id="resultMessage"></p>
+                            
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-3">
+                                    <div class="result-stat">
+                                        <div class="stat-number text-success" id="correctAnswers">0</div>
+                                        <div class="stat-label">Correct</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="result-stat">
+                                        <div class="stat-number text-danger" id="incorrectAnswers">0</div>
+                                        <div class="stat-label">Incorrect</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="result-stat">
+                                        <div class="stat-number text-primary" id="finalScore">0%</div>
+                                        <div class="stat-label">Score</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="result-stat">
+                                        <div class="stat-number text-info" id="timeTaken">0:00</div>
+                                        <div class="stat-label">Time Taken</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-3 justify-content-center">
+                                <button class="btn btn-primary btn-lg px-4" onclick="restartQuiz()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>
+                                    Take Again
+                                </button>
+                                <button class="btn btn-outline-secondary btn-lg px-4" onclick="reviewAnswers()">
+                                    <i class="bi bi-eye me-2"></i>
+                                    Review Answers
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+		
+		// Quiz Data
+		const quizData = [
+		    {
+		        question: "What does HTML stand for?",
+		        options: [
+		            "Hyper Text Markup Language",
+		            "High Tech Modern Language",
+		            "Home Tool Markup Language",
+		            "Hyperlink and Text Markup Language"
+		        ],
+		        correct: 0
+		    },
+		    {
+		        question: "Which CSS property is used to control the text size?",
+		        options: [
+		            "font-style",
+		            "text-size",
+		            "font-size",
+		            "text-style"
+		        ],
+		        correct: 2
+		    },
+		    {
+		        question: "What is the correct JavaScript syntax to change the content of an HTML element?",
+		        options: [
+		            "document.getElement('demo').innerHTML = 'Hello World!'",
+		            "document.getElementById('demo').innerHTML = 'Hello World!'",
+		            "#demo.innerHTML = 'Hello World!'",
+		            "document.getElementByName('demo').innerHTML = 'Hello World!'"
+		        ],
+		        correct: 1
+		    },
+		    {
+		        question: "Which of the following is NOT a valid HTTP method?",
+		        options: [
+		            "GET",
+		            "POST",
+		            "DELETE",
+		            "SEND"
+		        ],
+		        correct: 3
+		    },
+		    {
+		        question: "What does CSS stand for?",
+		        options: [
+		            "Creative Style Sheets",
+		            "Cascading Style Sheets",
+		            "Computer Style Sheets",
+		            "Colorful Style Sheets"
+		        ],
+		        correct: 1
+		    },
+		    {
+		        question: "Which JavaScript framework is developed by Facebook?",
+		        options: [
+		            "Angular",
+		            "Vue.js",
+		            "React",
+		            "Ember.js"
+		        ],
+		        correct: 2
+		    },
+		    {
+		        question: "What is the purpose of the 'box-sizing' CSS property?",
+		        options: [
+		            "To set the size of text boxes",
+		            "To control how the total width and height of an element is calculated",
+		            "To create bordered boxes",
+		            "To set the box shadow"
+		        ],
+		        correct: 1
+		    },
+		    {
+		        question: "Which of the following is a NoSQL database?",
+		        options: [
+		            "MySQL",
+		            "PostgreSQL",
+		            "MongoDB",
+		            "SQLite"
+		        ],
+		        correct: 2
+		    },
+		    {
+		        question: "What does API stand for?",
+		        options: [
+		            "Application Programming Interface",
+		            "Advanced Programming Interface",
+		            "Application Process Interface",
+		            "Advanced Process Interface"
+		        ],
+		        correct: 0
+		    },
+		    {
+		        question: "Which Git command is used to create a new branch?",
+		        options: [
+		            "git new-branch",
+		            "git create-branch",
+		            "git branch",
+		            "git make-branch"
+		        ],
+		        correct: 2
+		    },
+		    {
+		        question: "What is the main purpose of Bootstrap?",
+		        options: [
+		            "Server-side scripting",
+		            "Database management",
+		            "Front-end web development framework",
+		            "Version control"
+		        ],
+		        correct: 2
+		    },
+		    {
+		        question: "Which of the following is NOT a JavaScript data type?",
+		        options: [
+		            "string",
+		            "boolean",
+		            "integer",
+		            "undefined"
+		        ],
+		        correct: 2
+		    },
+		    {
+		        question: "What does SQL stand for?",
+		        options: [
+		            "Standard Query Language",
+		            "Structured Query Language",
+		            "Simple Query Language",
+		            "System Query Language"
+		        ],
+		        correct: 1
+		    },
+		    {
+		        question: "Which HTTP status code indicates 'Not Found'?",
+		        options: [
+		            "200",
+		            "404",
+		            "500",
+		            "301"
+		        ],
+		        correct: 1
+		    },
+		    {
+		        question: "What is the correct way to declare a JavaScript variable?",
+		        options: [
+		            "variable myVar;",
+		            "v myVar;",
+		            "var myVar;",
+		            "declare myVar;"
+		        ],
+		        correct: 2
+		    }
+		];
+
+		// Quiz State
+		let currentQuestion = 0;
+		let userAnswers = [];
+		let timeRemaining = 900; // 15 minutes in seconds
+		let timerInterval;
+		let startTime;
+
+		// DOM Elements
+		const welcomeScreen = document.getElementById('welcomeScreen');
+		const quizScreen = document.getElementById('quizScreen');
+		const resultsScreen = document.getElementById('resultsScreen');
+		const questionText = document.getElementById('questionText');
+		const optionsContainer = document.getElementById('optionsContainer');
+		const currentQuestionNumber = document.getElementById('currentQuestionNumber');
+		const progressBar = document.getElementById('progressBar');
+		const prevBtn = document.getElementById('prevBtn');
+		const nextBtn = document.getElementById('nextBtn');
+		const submitBtn = document.getElementById('submitBtn');
+		const timer = document.getElementById('timer');
+		const timeLeft = document.getElementById('timeLeft');
+
+		// Initialize quiz
+		function startQuiz() {
+		    welcomeScreen.classList.add('d-none');
+		    quizScreen.classList.remove('d-none');
+		    
+		    startTime = new Date();
+		    startTimer();
+		    generateQuestionNavigator();
+		    displayQuestion();
+		    updateStats();
+		}
+
+		// Timer functionality
+		function startTimer() {
+		    timerInterval = setInterval(() => {
+		        timeRemaining--;
+		        updateTimerDisplay();
+		        
+		        if (timeRemaining <= 0) {
+		            clearInterval(timerInterval);
+		            submitQuiz();
+		        }
+		    }, 1000);
+		}
+
+		function updateTimerDisplay() {
+		    const minutes = Math.floor(timeRemaining / 60);
+		    const seconds = timeRemaining % 60;
+		    const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+		    
+		    timer.textContent = timeString;
+		    timeLeft.textContent = timeString;
+		    
+		    // Change color when time is running low
+		    if (timeRemaining <= 300) { // 5 minutes
+		        timer.classList.add('text-warning');
+		        timeLeft.classList.add('text-warning');
+		    }
+		    if (timeRemaining <= 60) { // 1 minute
+		        timer.classList.remove('text-warning');
+		        timer.classList.add('text-danger');
+		        timeLeft.classList.remove('text-warning');
+		        timeLeft.classList.add('text-danger');
+		    }
+		}
+
+		// Question navigation
+		function generateQuestionNavigator() {
+		    const navigator = document.getElementById('questionNavigator');
+		    navigator.innerHTML = '';
+		    
+		    for (let i = 0; i < quizData.length; i++) {
+		        const button = document.createElement('button');
+		        button.className = 'nav-question';
+		        button.textContent = (i + 1).toString();
+		        button.onclick = () => goToQuestion(i);
+		        navigator.appendChild(button);
+		    }
+		    
+		    updateQuestionNavigator();
+		}
+
+		function updateQuestionNavigator() {
+		    const navButtons = document.querySelectorAll('.nav-question');
+		    navButtons.forEach((button, index) => {
+		        button.classList.remove('current', 'answered');
+		        
+		        if (index === currentQuestion) {
+		            button.classList.add('current');
+		        } else if (userAnswers[index] !== undefined) {
+		            button.classList.add('answered');
+		        }
+		    });
+		}
+
+		// Display current question
+		function displayQuestion() {
+		    const question = quizData[currentQuestion];
+		    
+		    questionText.textContent = question.question;
+		    currentQuestionNumber.textContent = (currentQuestion + 1).toString();
+		    
+		    // Update progress bar
+		    const progress = ((currentQuestion + 1) / quizData.length) * 100;
+		    progressBar.style.width = `${progress}%`;
+		    
+		    // Generate options
+		    optionsContainer.innerHTML = '';
+		    question.options.forEach((option, index) => {
+		        const optionDiv = document.createElement('div');
+		        optionDiv.className = 'option';
+		        optionDiv.textContent = option;
+		        optionDiv.onclick = () => selectOption(index);
+		        
+		        // Check if this option was previously selected
+		        if (userAnswers[currentQuestion] === index) {
+		            optionDiv.classList.add('selected');
+		        }
+		        
+		        optionsContainer.appendChild(optionDiv);
+		    });
+		    
+		    // Update navigation buttons
+		    prevBtn.disabled = currentQuestion === 0;
+		    
+		    if (currentQuestion === quizData.length - 1) {
+		        nextBtn.classList.add('d-none');
+		        submitBtn.classList.remove('d-none');
+		    } else {
+		        nextBtn.classList.remove('d-none');
+		        submitBtn.classList.add('d-none');
+		    }
+		    
+		    updateQuestionNavigator();
+		    updateStats();
+		    
+		    // Add animation
+		    optionsContainer.classList.add('fade-in');
+		    setTimeout(() => {
+		        optionsContainer.classList.remove('fade-in');
+		    }, 600);
+		}
+
+		// Select an option
+		function selectOption(index) {
+		    // Remove previous selection
+		    document.querySelectorAll('.option').forEach(option => {
+		        option.classList.remove('selected');
+		    });
+		    
+		    // Add selection to clicked option
+		    document.querySelectorAll('.option')[index].classList.add('selected');
+		    
+		    // Store user's answer
+		    userAnswers[currentQuestion] = index;
+		    
+		    updateQuestionNavigator();
+		    updateStats();
+		}
+
+		// Navigation functions
+		function nextQuestion() {
+		    if (currentQuestion < quizData.length - 1) {
+		        currentQuestion++;
+		        displayQuestion();
+		    }
+		}
+
+		function previousQuestion() {
+		    if (currentQuestion > 0) {
+		        currentQuestion--;
+		        displayQuestion();
+		    }
+		}
+
+		function goToQuestion(questionIndex) {
+		    currentQuestion = questionIndex;
+		    displayQuestion();
+		}
+
+		// Update statistics
+		function updateStats() {
+		    const answeredCount = userAnswers.filter(answer => answer !== undefined).length;
+		    const remainingCount = quizData.length - answeredCount;
+		    
+		    document.getElementById('answeredCount').textContent = `${answeredCount}/${quizData.length}`;
+		    document.getElementById('remainingCount').textContent = remainingCount.toString();
+		}
+
+		// Submit quiz
+		function submitQuiz() {
+		    clearInterval(timerInterval);
+		    
+		    // Calculate results
+		    let correctAnswers = 0;
+		    userAnswers.forEach((answer, index) => {
+		        if (answer === quizData[index].correct) {
+		            correctAnswers++;
+		        }
+		    });
+		    
+		    const incorrectAnswers = quizData.length - correctAnswers;
+		    const score = Math.round((correctAnswers / quizData.length) * 100);
+		    
+		    // Calculate time taken
+		    const endTime = new Date();
+		    const timeTaken = Math.floor((endTime - startTime) / 1000);
+		    const minutesTaken = Math.floor(timeTaken / 60);
+		    const secondsTaken = timeTaken % 60;
+		    
+		    // Hide quiz screen and show results
+		    quizScreen.classList.add('d-none');
+		    resultsScreen.classList.remove('d-none');
+		    
+		    // Display results
+		    displayResults(correctAnswers, incorrectAnswers, score, minutesTaken, secondsTaken);
+		}
+
+		// Display results
+		function displayResults(correct, incorrect, score, minutes, seconds) {
+		    const resultIcon = document.getElementById('resultIcon');
+		    const resultTitle = document.getElementById('resultTitle');
+		    const resultMessage = document.getElementById('resultMessage');
+		    
+		    // Set result icon and message based on score
+		    if (score >= 80) {
+		        resultIcon.innerHTML = '<i class="bi bi-trophy-fill text-warning display-1"></i>';
+		        resultTitle.textContent = 'Excellent!';
+		        resultTitle.className = 'display-4 fw-bold mb-3 text-success';
+		        resultMessage.textContent = 'Outstanding performance! You have demonstrated excellent technical knowledge.';
+		    } else if (score >= 60) {
+		        resultIcon.innerHTML = '<i class="bi bi-emoji-smile-fill text-primary display-1"></i>';
+		        resultTitle.textContent = 'Good Job!';
+		        resultTitle.className = 'display-4 fw-bold mb-3 text-primary';
+		        resultMessage.textContent = 'Well done! You have a solid understanding of the technical concepts.';
+		    } else {
+		        resultIcon.innerHTML = '<i class="bi bi-emoji-neutral-fill text-warning display-1"></i>';
+		        resultTitle.textContent = 'Keep Learning!';
+		        resultTitle.className = 'display-4 fw-bold mb-3 text-warning';
+		        resultMessage.textContent = 'There\'s room for improvement. Keep studying and you\'ll do better next time!';
+		    }
+		    
+		    // Update result statistics
+		    document.getElementById('correctAnswers').textContent = correct.toString();
+		    document.getElementById('incorrectAnswers').textContent = incorrect.toString();
+		    document.getElementById('finalScore').textContent = `${score}%`;
+		    document.getElementById('timeTaken').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+		    
+		    // Add animation
+		    resultsScreen.classList.add('fade-in');
+		    setTimeout(() => {
+		        resultsScreen.classList.remove('fade-in');
+		    }, 600);
+		}
+
+		// Restart quiz
+		function restartQuiz() {
+		    // Reset all variables
+		    currentQuestion = 0;
+		    userAnswers = [];
+		    timeRemaining = 900;
+		    clearInterval(timerInterval);
+		    
+		    // Reset timer display
+		    timer.classList.remove('text-warning', 'text-danger');
+		    timeLeft.classList.remove('text-warning', 'text-danger');
+		    
+		    // Show welcome screen
+		    resultsScreen.classList.add('d-none');
+		    welcomeScreen.classList.remove('d-none');
+		}
+
+		// Review answers (placeholder function)
+		function reviewAnswers() {
+		    alert('Review functionality would show detailed answer explanations. This is a demo implementation.');
+		    
+		    // In a real implementation, this would show a detailed review screen
+		    // with correct answers, explanations, and user's selections
+		}
+
+		// Initialize the application
+		document.addEventListener('DOMContentLoaded', function() {
+		    // Set initial timer display
+		    updateTimerDisplay();
+		    
+		    // Add keyboard navigation
+		    document.addEventListener('keydown', function(e) {
+		        if (quizScreen.classList.contains('d-none')) return;
+		        
+		        switch(e.key) {
+		            case 'ArrowLeft':
+		                if (!prevBtn.disabled) previousQuestion();
+		                break;
+		            case 'ArrowRight':
+		                if (currentQuestion < quizData.length - 1) nextQuestion();
+		                break;
+		            case '1':
+		            case '2':
+		            case '3':
+		            case '4':
+		                const optionIndex = parseInt(e.key) - 1;
+		                if (optionIndex < quizData[currentQuestion].options.length) {
+		                    selectOption(optionIndex);
+		                }
+		                break;
+		        }
+		    });
+		    
+		    // Add smooth scrolling
+		    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+		        anchor.addEventListener('click', function (e) {
+		            e.preventDefault();
+		            const target = document.querySelector(this.getAttribute('href'));
+		            if (target) {
+		                target.scrollIntoView({
+		                    behavior: 'smooth',
+		                    block: 'start'
+		                });
+		            }
+		        });
+		    });
+		});
+
+		// Add some interactive effects
+		document.addEventListener('mousemove', function(e) {
+		    // Add subtle parallax effect to cards
+		    const cards = document.querySelectorAll('.card');
+		    const mouseX = e.clientX / window.innerWidth;
+		    const mouseY = e.clientY / window.innerHeight;
+		    
+		    cards.forEach(card => {
+		        const rect = card.getBoundingClientRect();
+		        const cardCenterX = rect.left + rect.width / 2;
+		        const cardCenterY = rect.top + rect.height / 2;
+		        
+		        const deltaX = (e.clientX - cardCenterX) * 0.02;
+		        const deltaY = (e.clientY - cardCenterY) * 0.02;
+		        
+		        card.style.transform = `perspective(1000px) rotateX(${deltaY}deg) rotateY(${deltaX}deg)`;
+		    });
+		});
+
+		// Reset card transforms when mouse leaves
+		document.addEventListener('mouseleave', function() {
+		    const cards = document.querySelectorAll('.card');
+		    cards.forEach(card => {
+		        card.style.transform = '';
+		    });
+		});
+	</script>
+</body>
+</html>
